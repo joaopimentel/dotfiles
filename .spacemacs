@@ -31,6 +31,8 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     sql
+     rust
      csv
      yaml
      html
@@ -46,6 +48,7 @@ values."
      ;; better-defaults
      emacs-lisp
      git
+     github
      markdown
      org
      ;; (shell :variables
@@ -66,6 +69,7 @@ values."
    dotspacemacs-additional-packages '(flycheck-color-mode-line
                                       rjsx-mode
                                       stylus-mode
+                                      blacken
    )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
