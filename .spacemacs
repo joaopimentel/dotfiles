@@ -1,16 +1,16 @@
-;; -*- mode: emacs-lisp -*-
+;; -*- mode: emacs-lisp; lexical-binding: t -*-
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
 (defun dotspacemacs/layers ()
-  "Configuration Layers declaration.
-You should not put any user code in this function besides modifying the variable
-values."
+  "Layer configuration:
+This function should only modify configuration layer settings."
   (setq-default
    ;; Base distribution to use. This is a layer contained in the directory
    ;; `+distribution'. For now available distributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
    dotspacemacs-distribution 'spacemacs
+
    ;; Lazy installation of layers (i.e. layers are installed only when a file
    ;; with a supported type is opened). Possible values are `all', `unused'
    ;; and `nil'. `unused' will lazy install only unused layers (i.e. layers
@@ -31,6 +31,7 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     typescript
      sql
      rust
      csv
@@ -50,7 +51,7 @@ values."
      git
      github
      markdown
-     org
+     ;; org
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
@@ -61,6 +62,7 @@ values."
      gtags
      imenu-list
      react
+     ;; lsp
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -327,14 +329,17 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
   ;; (global-set-key (kbd "<s-up>") 'evil-window-up)
-  (global-set-key (kbd "<H-right>") 'persp-next)
-  (global-set-key (kbd "<H-left>") 'persp-prev)
+  ;; (global-set-key (kbd "<H-right>") 'persp-next)
+  ;; (global-set-key (kbd "<H-left>") 'persp-prev)
+  (global-set-key (kbd "<s-right>") 'persp-next)
+  (global-set-key (kbd "<s-left>") 'persp-prev)
   (define-key evil-motion-state-map (kbd "SPC <left>") #'evil-window-left)
   (define-key evil-motion-state-map (kbd "SPC <down>") #'evil-window-down)
   (define-key evil-motion-state-map (kbd "SPC <up>") #'evil-window-up)
   (define-key evil-motion-state-map (kbd "SPC <right>") #'evil-window-right)
   ;; Ctrl+Enter to show imenu-list
-  (global-set-key (kbd "<H-return>") 'imenu-list-minor-mode)
+  ;; (global-set-key (kbd "<H-return>") 'imenu-list-minor-mode)
+  (global-set-key (kbd "<s-return>") 'imenu-list-minor-mode)
   ;; Shift+Enter to show helm semantic imenu search
   (global-set-key (kbd "<S-return>") 'helm-semantic-or-imenu)
   ;; emacs window: always show full path of the buffer you're currently editing
@@ -353,15 +358,24 @@ you should place your code here."
   (add-hook 'js2-mode-hook #'(lambda () (modify-syntax-entry ?_ "w")))
   (require 'flycheck-color-mode-line)
 
+  ;; Disable link following on click
+  (add-hook 'python-mode-hook (lambda () (goto-address-mode -1)))
+
   " From https://github.com/syl20bnr/spacemacs/issues/5750
     This separates the Emacs clipboard from the OSX one and binds cmd-c cmd-p
     To copy to OSX Clipboard and paste from OSX clipboard
   "
   (setq x-select-enable-clipboard nil)
-  (define-key evil-visual-state-map (kbd "H-c") (kbd "\"+y"))
-  (define-key evil-insert-state-map  (kbd "H-v") (kbd "+"))
-  (define-key evil-ex-completion-map (kbd "H-v") (kbd "+"))
-  (define-key evil-ex-search-keymap  (kbd "H-v") (kbd "+"))
+  ;; For spacemacs@develop
+  ;; (define-key evil-visual-state-map (kbd "H-c") (kbd "\"+y"))
+  ;; (define-key evil-insert-state-map  (kbd "H-v") (kbd "+"))
+  ;; (define-key evil-ex-completion-map (kbd "H-v") (kbd "+"))
+  ;; (define-key evil-ex-search-keymap  (kbd "H-v") (kbd "+"))
+  ;; For spacemacs@master
+  (define-key evil-visual-state-map (kbd "s-c") (kbd "\"+y"))
+  (define-key evil-insert-state-map  (kbd "s-v") (kbd "+"))
+  (define-key evil-ex-completion-map (kbd "s-v") (kbd "+"))
+  (define-key evil-ex-search-keymap  (kbd "s-v") (kbd "+"))
 
   ;;; scroll one line at a time (less "jumpy" than defaults)
   (setq mouse-wheel-scroll-amount '(3 ((shift) . 1))) ;; two lines at a time
@@ -380,6 +394,16 @@ you should place your code here."
   ;; JS with 2 space indentation
   (setq-default js2-basic-offset 2
                 js-indent-level 2)
+  ;; UTF8!
+  ;; (set-language-environment 'utf-8)
+  ;; (set-terminal-coding-system 'utf-8)
+  ;; (setq locale-coding-system 'utf-8)
+  ;; (set-default-coding-systems 'utf-8)
+  ;; (set-selection-coding-system 'utf-8)
+  ;; (prefer-coding-system 'utf-8)
+  (setenv "LANG" "en_US.UTF-8")
+
+  (setq python-indent-guess-indent-offset nil)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -404,10 +428,11 @@ you should place your code here."
  '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
  '(frame-background-mode (quote dark))
  '(helm-ag-base-command "ag --nocolor --nogroup")
+ '(helm-completion-style (quote emacs))
  '(imenu-list-minor-mode t)
  '(package-selected-packages
    (quote
-    (magit-gh-pulls github-search github-clone github-browse-file gist gh marshal logito pcache ht lv transient sql-indent toml-mode racer flycheck-rust cargo rust-mode blacken org-category-capture org-mime ghub po-mode stylus-mode sws-mode rjsx-mode csv-mode yaml-mode org-projectile org-present org-pomodoro alert log4e gntp org-download htmlize gnuplot smeargle orgit magit-gitflow helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link evil-magit magit magit-popup git-commit with-editor helm-company helm-c-yasnippet fuzzy company-web web-completion-data company-tern dash-functional tern company-statistics company-anaconda company auto-yasnippet ac-ispell auto-complete web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode imenu-list helm-gtags ggtags flycheck-color-mode-line web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode reveal-in-osx-finder pbcopy osx-trash osx-dictionary launchctl evil-tabs elscreen mode-icons tabbar-ruler tabbar mmm-mode markdown-toc markdown-mode gh-md flycheck-pos-tip pos-tip flycheck yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+    (tide typescript-mode magit-section magit-gh-pulls github-search github-clone github-browse-file gist gh marshal logito pcache ht lv transient sql-indent toml-mode racer flycheck-rust cargo rust-mode blacken org-category-capture org-mime ghub po-mode stylus-mode sws-mode rjsx-mode csv-mode yaml-mode org-projectile org-present org-pomodoro alert log4e gntp org-download htmlize gnuplot smeargle orgit magit-gitflow helm-gitignore gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link evil-magit magit magit-popup git-commit with-editor helm-company helm-c-yasnippet fuzzy company-web web-completion-data company-tern dash-functional tern company-statistics company-anaconda company auto-yasnippet ac-ispell auto-complete web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode imenu-list helm-gtags ggtags flycheck-color-mode-line web-beautify livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode reveal-in-osx-finder pbcopy osx-trash osx-dictionary launchctl evil-tabs elscreen mode-icons tabbar-ruler tabbar mmm-mode markdown-toc markdown-mode gh-md flycheck-pos-tip pos-tip flycheck yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed dash aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
